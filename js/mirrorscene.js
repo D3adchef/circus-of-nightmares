@@ -23,21 +23,10 @@ class MirrorScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.escKey = this.input.keyboard.addKey('ESC');
 
-    if (!window.GameTimer.start) {
-      window.GameTimer.start = Date.now();
-    }
-
     this.music = this.sound.add('mirrorsMusic', { loop: true, volume: 0.4 });
     this.music.play();
 
-    // ✅ Fixed-position timer
-    this.timerText = this.add.text(this.scale.width - 20, 20, '', {
-      fontFamily: 'Courier New',
-      fontSize: '36px',
-      color: '#ff0000'
-    }).setOrigin(1, 0).setScrollFactor(0).setDepth(99);
-
-    // ✅ Start popup box remains in center
+    // Start popup box
     this.startBox = this.add.rectangle(this.scale.width / 2, 240, 1400, 140, 0x000000, 0.85)
       .setStrokeStyle(4, 0xff00ff).setOrigin(0.5).setScrollFactor(0);
     this.startText = this.add.text(this.scale.width / 2, 240,
@@ -59,7 +48,7 @@ class MirrorScene extends Phaser.Scene {
       this.controlsEnabled = true;
     });
 
-    // ✅ Fixed-position interaction box
+    // Fixed-position interaction box
     this.interactBox = this.add.rectangle(this.scale.width / 2, this.scale.height - 120, 600, 140, 0x000000, 0.85)
       .setStrokeStyle(3, 0xffffff).setOrigin(0.5).setVisible(false).setScrollFactor(0).setDepth(99);
 
@@ -143,11 +132,6 @@ class MirrorScene extends Phaser.Scene {
     }
     if (this.cursors.up.isDown) this.player.setVelocityY(-200);
     else if (this.cursors.down.isDown) this.player.setVelocityY(200);
-
-    const remaining = window.GameTimer.getRemaining();
-    const seconds = Math.floor(remaining / 1000);
-    const minutes = Math.floor(seconds / 60);
-    this.timerText.setText(`${minutes}:${(seconds % 60).toString().padStart(2, '0')}`);
   }
 
   showInteraction(message) {

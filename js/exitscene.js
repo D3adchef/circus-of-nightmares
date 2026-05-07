@@ -27,17 +27,10 @@ class ExitScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    // 🕒 Fixed-position timer
-    this.timerText = this.add.text(this.scale.width - 20, 20, '', {
-      fontFamily: 'Courier New',
-      fontSize: '36px',
-      color: '#ff0000'
-    }).setOrigin(1, 0).setScrollFactor(0).setDepth(99);
-
     this.music = this.sound.add('jack', { loop: true, volume: 0.4 });
     this.music.play();
 
-    // 💬 Fixed-position interaction text
+    // Fixed-position interaction text
     this.interactBox = this.add.rectangle(this.scale.width / 2, this.scale.height - 120, 600, 140, 0x000000, 0.85)
       .setStrokeStyle(3, 0xffffff).setOrigin(0.5).setScrollFactor(0).setDepth(99).setVisible(true);
     this.interactText = this.add.text(this.scale.width / 2, this.scale.height - 120,
@@ -68,29 +61,36 @@ class ExitScene extends Phaser.Scene {
       const x = this.player.x;
       const y = this.player.y;
 
-      if (x >= 1544 && x <= 2041 && y >= 500 && y <= 617 && this.step < 4) {
+      const nearExitDoor = x >= 1544 && x <= 2041 && y >= 500 && y <= 617;
+      const nearBalloons = x >= 1290 && x <= 1600 && y >= 730 && y <= 897;
+      const nearBarrel1 = x >= 818 && x <= 980 && y >= 530 && y <= 670;
+      const nearBarrel2 = x >= 1110 && x <= 1268 && y >= 503 && y <= 623;
+      const nearSignPost = x >= 234 && x <= 670 && y >= 600 && y <= 713;
+      const nearAnything = nearExitDoor || nearBalloons || nearBarrel1 || nearBarrel2 || nearSignPost;
+
+      if (nearExitDoor && this.step < 4) {
         this.sound.play('fail');
         this.showInteraction("Not so fast, Pal.");
         return;
       }
 
-      if (x >= 1290 && x <= 1600 && y >= 730 && y <= 897 && this.step === 0) {
+      if (nearBalloons && this.step === 0) {
         this.sound.play('balloon');
         this.showInteraction("There's nothing here but weird smells and busted balloons.");
         this.step = 1;
-      } else if (x >= 818 && x <= 980 && y >= 530 && y <= 670 && this.step === 1) {
+      } else if (nearBarrel1 && this.step === 1) {
         this.sound.play('crash');
         this.showInteraction("I heard something move by the exit door.");
         this.step = 2;
-      } else if (x >= 1110 && x <= 1268 && y >= 503 && y <= 623 && this.step === 2) {
+      } else if (nearBarrel2 && this.step === 2) {
         this.sound.play('crash');
         this.showInteraction("I heard another noise near the exit.");
         this.step = 3;
-      } else if (x >= 234 && x <= 670 && y >= 600 && y <= 713 && this.step === 3) {
+      } else if (nearSignPost && this.step === 3) {
         this.sound.play('door');
         this.showInteraction("I heard the door unlock.");
         this.step = 4;
-      } else if (x >= 1544 && x <= 2041 && y >= 500 && y <= 617 && this.step === 4) {
+      } else if (nearExitDoor && this.step === 4) {
         this.sound.play('clap');
         this.showInteraction("I can't believe I'm free.");
         this.cameras.main.fadeOut(1500, 0, 0, 0);
@@ -98,7 +98,7 @@ class ExitScene extends Phaser.Scene {
           this.music.stop();
           this.scene.start("EntrancePostGameScene");
         });
-      } else {
+      } else if (nearAnything) {
         this.sound.play('fail');
         this.showInteraction("The door just locked.");
       }
@@ -143,11 +143,6 @@ class ExitScene extends Phaser.Scene {
     }
     if (this.cursors.up.isDown) this.player.setVelocityY(-200);
     else if (this.cursors.down.isDown) this.player.setVelocityY(200);
-
-    const remaining = window.GameTimer.getRemaining();
-    const seconds = Math.floor(remaining / 1000);
-    const minutes = Math.floor(seconds / 60);
-    this.timerText.setText(`${minutes}:${(seconds % 60).toString().padStart(2, '0')}`);
   }
 
   showInteraction(message) {

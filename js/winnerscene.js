@@ -15,7 +15,6 @@ class WinnerScene extends Phaser.Scene {
   }
 
   create() {
-    console.log("WinnerScene loaded");
     this.physics.world.setBounds(0, 0, 2304, 1025);
     this.cameras.main.setBounds(0, 0, 2304, 1025);
     this.add.image(0, 0, 'lair').setOrigin(0, 0).setDisplaySize(2304, 1025);
@@ -31,7 +30,7 @@ class WinnerScene extends Phaser.Scene {
     this.ambience = this.sound.add('clownAmbience', { loop: true, volume: 0.6 });
     this.ambience.play();
 
-    // 🧷 Fixed position interaction box
+    // Fixed position interaction box
     this.interactBox = this.add.rectangle(this.scale.width / 2, 80, 600, 140, 0x000000, 0.85)
       .setStrokeStyle(3, 0xff0000)
       .setScrollFactor(0)
@@ -143,8 +142,6 @@ class WinnerScene extends Phaser.Scene {
     }
     if (this.cursors.up.isDown) this.player.setVelocityY(-200);
     else if (this.cursors.down.isDown) this.player.setVelocityY(200);
-
-    console.log(`WinnerScene X: ${this.player.x.toFixed(2)}, Y: ${this.player.y.toFixed(2)}`);
   }
 }
 

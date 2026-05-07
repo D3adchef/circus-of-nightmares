@@ -27,17 +27,10 @@ class DressingScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    // 🕒 Fixed-position timer
-    this.timerText = this.add.text(this.scale.width - 20, 20, '', {
-      fontFamily: 'Courier New',
-      fontSize: '36px',
-      color: '#ff0000'
-    }).setOrigin(1, 0).setScrollFactor(0).setDepth(99);
-
     this.music = this.sound.add('dressingMusic', { loop: true, volume: 0.4 });
     this.music.play();
 
-    // 💬 Fixed-position interaction popup
+    // Fixed-position interaction popup
     this.interactBox = this.add.rectangle(this.scale.width / 2, this.scale.height - 120, 600, 140, 0x000000, 0.85)
       .setStrokeStyle(3, 0xffffff).setOrigin(0.5).setVisible(true).setScrollFactor(0).setDepth(99);
 
@@ -52,6 +45,7 @@ class DressingScene extends Phaser.Scene {
 
     this.boxRiddleShown = false;
     this.rightRoomUnlocked = false;
+    this.riddleDismissed = false;
     this.controlsEnabled = false;
 
     this.input.keyboard.once('keydown-SPACE', () => {
@@ -75,10 +69,12 @@ class DressingScene extends Phaser.Scene {
       const x = this.player.x;
       const y = this.player.y;
 
-      if (this.boxRiddleShown && !this.rightRoomUnlocked) {
+      if (this.boxRiddleShown && !this.rightRoomUnlocked && !this.riddleDismissed) {
         this.interactText.setVisible(false);
         this.interactBox.setVisible(false);
         this.rightRoomUnlocked = true;
+        this.riddleDismissed = true;
+        return;
       }
 
       if (!this.rightRoomUnlocked && this.boxRiddleShown) return;
@@ -110,6 +106,7 @@ class DressingScene extends Phaser.Scene {
                 this.interactText.setVisible(true);
                 this.interactBox.setVisible(true);
                 this.boxRiddleShown = true;
+                this.riddleDismissed = false;
               }
             });
           });
@@ -184,11 +181,6 @@ class DressingScene extends Phaser.Scene {
     }
     if (this.cursors.up.isDown) this.player.setVelocityY(-200);
     else if (this.cursors.down.isDown) this.player.setVelocityY(200);
-
-    const remaining = window.GameTimer.getRemaining();
-    const seconds = Math.floor(remaining / 1000);
-    const minutes = Math.floor(seconds / 60);
-    this.timerText.setText(`${minutes}:${(seconds % 60).toString().padStart(2, '0')}`);
   }
 
   showInteraction(message) {
@@ -196,7 +188,7 @@ class DressingScene extends Phaser.Scene {
     this.interactText.setVisible(true);
     this.interactBox.setVisible(true);
     this.time.delayedCall(2500, () => {
-      if (!this.boxRiddleShown) {
+      if (!this.boxRiddleShown || this.riddleDismissed) {
         this.interactText.setVisible(false);
         this.interactBox.setVisible(false);
       }
@@ -223,7 +215,7 @@ class DressingScene extends Phaser.Scene {
       this.showInteraction(message);
     } else {
       this.sound.play('fail');
-      this.showInteraction("That’s not right...");
+      this.showInteraction("That's not right...");
       this.jackInput = [];
     }
   }

@@ -51,6 +51,7 @@ class EntranceScene extends Phaser.Scene {
     this.controlsEnabled = false;
 
     this.input.keyboard.once('keydown-SPACE', () => {
+      window.GameTimer.start = Date.now();
       this.entranceMusic.play();
       this.titleBox.setVisible(false);
       this.titleText.setVisible(false);
@@ -60,14 +61,7 @@ class EntranceScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    // 🧱 Fixed-position timer
-    this.timerText = this.add.text(this.scale.width - 20, 20, '', {
-      fontFamily: 'Courier New',
-      fontSize: '36px',
-      color: '#ff0000'
-    }).setScrollFactor(0).setOrigin(1, 0).setDepth(99);
-
-    // 🧱 Fixed-position warning box
+    // Fixed-position warning box
     this.warningBox = this.add.rectangle(this.scale.width / 2, this.scale.height - 160, 600, 140, 0x000000, 0.85)
       .setStrokeStyle(4, 0xffffff)
       .setOrigin(0.5)
@@ -83,7 +77,7 @@ class EntranceScene extends Phaser.Scene {
       wordWrap: { width: 550 }
     }).setOrigin(0.5).setScrollFactor(0).setVisible(false).setDepth(99);
 
-    // 🧱 Fixed-position dialogue box
+    // Fixed-position dialogue box
     this.dialogueBox = this.add.rectangle(this.scale.width / 2, this.scale.height - 300, 500, 140, 0x000000, 0.9)
       .setStrokeStyle(3, 0xff0000)
       .setOrigin(0.5)
@@ -112,7 +106,7 @@ class EntranceScene extends Phaser.Scene {
       }
     });
 
-    // 👻 Clown flicker
+    // Clown flicker
     this.clown = this.add.image(0, 0, 'clown').setScale(4).setVisible(false);
     this.time.addEvent({
       delay: Phaser.Math.Between(5000, 9000),
@@ -126,10 +120,6 @@ class EntranceScene extends Phaser.Scene {
         });
       }
     });
-
-    if (!window.GameTimer.start) {
-      window.GameTimer.start = Date.now();
-    }
   }
 
   update() {
@@ -157,7 +147,6 @@ class EntranceScene extends Phaser.Scene {
 
     const x = this.player.x;
     const y = this.player.y;
-    console.log(`Player X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}`);
 
     this.atEnterDoor = false;
     this.atStaffDoor = false;
@@ -178,12 +167,6 @@ class EntranceScene extends Phaser.Scene {
       this.dialogueBox.setVisible(false);
       this.dialogueText.setVisible(false);
     }
-
-    const remaining = window.GameTimer.getRemaining();
-    const seconds = Math.floor(remaining / 1000);
-    const minutes = Math.floor(seconds / 60);
-    const formatted = `${minutes}:${(seconds % 60).toString().padStart(2, '0')}`;
-    this.timerText.setText(formatted);
   }
 
   showWarning(message) {

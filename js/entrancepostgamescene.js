@@ -26,7 +26,10 @@ class EntrancePostGameScene extends Phaser.Scene {
     this.controlsEnabled = false;
     this.cursors = this.input.keyboard.createCursorKeys();
 
-    // 💬 Fixed-position warning and dialogue boxes
+    // FIX: spaceKey created once in create instead of every frame in update
+    this.spaceKey = this.input.keyboard.addKey('SPACE');
+
+    // Fixed-position warning and dialogue boxes
     this.warningBox = this.add.rectangle(this.scale.width / 2, this.scale.height - 100, 600, 140, 0x000000, 0.85)
       .setStrokeStyle(4, 0xffffff)
       .setOrigin(0.5)
@@ -99,7 +102,6 @@ class EntrancePostGameScene extends Phaser.Scene {
 
     const x = this.player.x;
     const y = this.player.y;
-    console.log(`Player X: ${x.toFixed(2)}, Y: ${y.toFixed(2)}`);
 
     const atStaffDoor = x > 322 && x < 652 && Math.abs(y - 687) < 30;
 
@@ -110,7 +112,8 @@ class EntrancePostGameScene extends Phaser.Scene {
       this.warningText.setVisible(false);
     }
 
-    if (this.input.keyboard.checkDown(this.input.keyboard.addKey('SPACE'), 250)) {
+    // FIX: uses this.spaceKey created in create() instead of addKey every frame
+    if (this.input.keyboard.checkDown(this.spaceKey, 250)) {
       if (atStaffDoor) {
         this.entranceMusic.stop();
         this.scene.start('WinnerScene');
